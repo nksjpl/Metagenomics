@@ -22,16 +22,43 @@
 
     #Tools: 
 
-	NanoFilt (filtering and trimming).
-	Porechop (adapter removal).
+        NanoFilt (filtering and trimming).
+        Porechop (adapter removal).
 
 	#Steps:
 
-    1. Filter reads by quality (e.g., Q>10) and length (e.g., >500 bp) using NanoFilt.
-    2. Remove adapters with Porechop.
-    3. Assess quality with NanoStat.
+        1. Filter reads by quality (e.g., Q>10) and length (e.g., >500 bp) using NanoFilt.
+        2. Remove adapters with Porechop.
+        3. Assess quality with NanoStat.
 
     #Command Example for bash
 
-    porechop -i input.fastq -o trimmed.fastq 
-    nanofilt -q 10 -l 500 trimmed.fastq > filtered.fastq
+        porechop -i input.fastq -o trimmed.fastq 
+        nanofilt -q 10 -l 500 trimmed.fastq > filtered.fastq
+
+
+    2. Host/Contaminant Removal (Optional)
+
+	Objective: Remove host or non-target sequences (e.g., human DNA).
+
+	Tools: 
+
+        1. Bowtie2 (Illumina) or Minimap2 (Nanopore) for alignment to a reference host genome.
+        2. Samtools for filtering unmapped reads.
+
+	Steps:
+
+        1. Index the host genome (e.g., human GRCh38).
+        2. Map reads to the host genome.
+        3. Extract unmapped reads (metagenomic fraction).
+
+	#Command Example for bash 
+	
+    Illumina:
+        bowtie2 -x host_index -1 output_R1_paired.fq -2 output_R2_paired.fq | samtools view -b -f 4 -o unmapped.bam
+        samtools fastq unmapped.bam > cleaned.fastq
+        
+	Nanopore:
+        minimap2 -ax map-ont host_index filtered.fastq | samtools view -b -f 4 -o unmapped.bam
+        samtools fastq unmapped.bam > cleaned.fastq
+
