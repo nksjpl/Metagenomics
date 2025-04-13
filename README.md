@@ -62,3 +62,5 @@
         minimap2 -ax map-ont host_index filtered.fastq | samtools view -b -f 4 -o unmapped.bam
         samtools fastq unmapped.bam > cleaned.fastq
 
+    Note:
+
